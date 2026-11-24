@@ -1,0 +1,30 @@
+{
+  "name": "taxlaw-agent",
+  "productName": "세법 근거 에이전트",
+  "version": "0.1.0",
+  "description": "국세법령정보시스템과 대법원 판례(사법정보공개포털)만 근거로 사고하는 세무 리서치 에이전트",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --x64"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.13.0"
+  },
+  "devDependencies": {
+    "electron": "^45.4.1",
+    "electron-builder": "^26.18.0"
+  },
+  "build": {
+    "appId": "kr.taxoffice.taxlawagent",
+    "productName": "세법 근거 에이전트",
+    "files": ["src/**/*", "package.json"],
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>세법 근거 에이전트</title>
+<style>
+  :root { --bg:#f6f5f2; --panel:#fff; --ink:#1f2328; --muted:#6b6f76; --line:#e3e1dc; --accent:#1d4e89; --soft:#eef3f9; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:"Pretendard","Malgun Gothic",sans-serif; background:var(--bg); color:var(--ink); height:100vh; display:flex; flex-direction:column; }
+  header { display:flex; align-items:center; gap:12px; padding:10px 18px; border-bottom:1px solid var(--line); background:var(--panel); }
+  header h1 { font-size:16px; margin:0; }
+  header .src { font-size:12px; color:var(--muted); }
+  header .sp { flex:1; }
+  button { font:inherit; border:1px solid var(--line); background:#fff; border-radius:6px; padding:6px 12px; cursor:pointer; }
+  button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+  button:disabled { opacity:.5; cursor:default; }
+  main { flex:1; display:grid; grid-template-columns: 1fr 360px; min-height:0; }
+  #chat { overflow-y:auto; padding:20px 28px; }
+  #log { border-left:1px solid var(--line); background:var(--panel); overflow-y:auto; padding:14px; font-size:12.5px; }
+  #log h2 { font-size:13px; margin:0 0 10px; color:var(--muted); }
+  .ev { padding:7px 9px; border-radius:6px; margin-bottom:6px; background:#fafaf8; border:1px solid var(--line); word-break:break-all; }
+  .ev.tool { background:var(--soft); border-color:#d5e1ef; }
+  .ev.err { background:#fdf0ef; border-color:#f2cfcb; }
+  .ev .n { font-weight:600; }
+  .ev a { color:var(--accent); cursor:pointer; text-decoration:underline; }
+  .msg { max-width:900px; margin:0 auto 18px; }
+  .msg.user .b { background:var(--accent); color:#fff; padding:10px 14px; border-radius:10px; display:inline-block; white-space:pre-wrap; }
+  .msg.user { text-align:right; }
+  .msg.bot .b { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px 20px; line-height:1.7; }
+  .msg.bot .b h1,.msg.bot .b h2,.msg.bot .b h3 { font-size:15px; margin:14px 0 6px; }
+  .msg.bot .b a { color:var(--accent); cursor:pointer; }
+  .msg.bot .tools { margin-top:6px; text-align:right; }
+  .msg.bot .tools button { font-size:12px; padding:3px 9px; }
+  .status { color:var(--muted); font-size:13px; max-width:900px; margin:0 auto 12px; }
+  footer { padding:12px 18px; border-top:1px solid var(--line); background:var(--panel); display:flex; gap:10px; }
+  textarea { flex:1; font:inherit; padding:10px; border:1px solid var(--line); border-radius:8px; resize:none; height:72px; }
+  dialog { border:1px solid var(--line); border-radius:10px; padding:20px; width:440px; }
+  dialog label { display:block; font-size:13px; margin:12px 0 4px; }
+  dialog input, dialog select { width:100%; font:inherit; padding:7px; border:1px solid var(--line); border-radius:6px; }
+  dialog .row { display:flex; justify-content:flex-end; gap:8px; margin-top:16px; }
+  .hint { font-size:12px; color:var(--muted); }
+  .empty { max-width:700px; margin:60px auto; color:var(--muted); line-height:1.8; }
+  .empty b { color:var(--ink); }
+</style>
+</head>
+<body>
+<header>
+  <h1>세법 근거 에이전트</h1>
+  <span class="src">근거: 국세법령정보시스템 · 대법원 판례(사법정보공개포털)</span>
+  <span class="sp"></span>
+  <span id="cost" class="hint"></span>
+  <button id="btnNew">새 질문</button>
+  <button id="btnSettings">설정</button>
+</header>
+<main>
+  <section id="chat">
+    <div class="empty" id="empty">
+      <b>세무 질문을 입력하세요.</b><br>
+      에이전트가 국세법령정보시스템과 대법원 판례만 검색·열람하고, 읽은 자료를 근거로 결론을 정리합니다.<br>
+      예) 특수관계법인에 토지를 감정가보다 낮게 양도한 경우 부당행위계산부인 요건과 시가 판단 기준은?<br>
+      예) 운행기록부 없이 업무용승용차를 리스하다 중도 취득하면 손금 한도는 어떻게 계산하나?
+    </div>
+  </section>
+  <aside id="log"><h2>조사 기록</h2></aside>
+</main>
+<footer>
+  <textarea id="q" placeholder="질문 (Ctrl+Enter로 전송)"></textarea>
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <button class="primary" id="btnAsk">질문하기</button>
+    <button id="btnStop" disabled>중지</button>
+  </div>
+</footer>
+
+<dialog id="dlg">
+  <h3 style="margin-top:0">설정</h3>
+  <label>Anthropic API 키</label>
+  <input id="key" type="password" placeholder="sk-ant-... (저장된 키를 유지하려면 비워두세요)">
+  <div class="hint">키는 이 PC에 Windows 암호화(DPAPI)로 저장됩니다.</div>
+  <label>모델</label>
+  <select id="model"></select>
+  <div class="row"><button id="dlgCancel">취소</button><button class="primary" id="dlgSave">저장</button></div>
+</dialog>
+
+<script src="renderer.js"></script>
+</body>
+</html>
